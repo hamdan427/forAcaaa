@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+font-family:'Poppins',sans-serif;
+color:white;
+overflow-x:hidden;
+background:transparent;
+}
+
+/* BACKGROUND FIX */
+.bg{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:url('poto4.png') no-repeat center;
+background-size:cover;
+background-attachment:fixed;
+z-index:-3;
+}
+
+.overlay{
+position:fixed;
+width:100%;height:100%;
+background:linear-gradient(to bottom,rgba(0,30,80,0.35),rgba(255,255,255,0.1));
+z-index:-2;
+}
+
+/* FIREWORKS */
+canvas{
+position:fixed;
+top:0;left:0;
+z-index:-1;
+pointer-events:none;
+}
+
+/* SCENE */
+.scene{
+position:absolute;
+width:100%;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+transition:1s ease;
+padding:20px;
+}
+
+.hidden{
+opacity:0;
+transform:scale(1.05);
+filter:blur(5px);
+pointer-events:none;
+}
+
+/* TITLE */
+.title{
+font-family:'Playfair Display';
+font-size:2.3em;
+text-align:center;
+text-shadow:0 0 25px #ffb6c1;
+}
+
+/* PHOTO */
+.photo{
+position:absolute;
+top:50%;
+transform:translateY(-50%) rotate(-6deg);
+width:160px;
+padding:8px;
+background:white;
+border-radius:10px;
+box-shadow:0 0 25px pink;
+}
+.left{left:20px}
+.right{right:20px;transform:translateY(-50%) rotate(6deg)}
+
+/* BUTTON */
+.btn{
+margin-top:20px;
+padding:12px 28px;
+border:none;
+border-radius:25px;
+background:linear-gradient(45deg,#89cff0,#ffb6c1);
+color:white;
+cursor:pointer;
+transition:.3s;
+}
+.btn:hover{
+transform:scale(1.1);
+box-shadow:0 0 20px pink;
+}
+
+/* CARD QUIZ */
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:15px;
+width:100%;
+max-width:500px;
+margin-top:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.15);
+padding:15px;
+border-radius:15px;
+text-align:center;
+cursor:pointer;
+transition:.3s;
+}
+.card:hover{
+transform:scale(1.05);
+background:#ffb6c1;
+}
+
+/* PAPER */
+.paper{
+background:#e6ccb2;
+color:#3b2f2f;
+padding:20px;
+width:90%;
+max-width:650px;
+max-height:70vh;
+overflow-y:auto;
+border-radius:12px;
+box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+
+/* FINAL */
+.final-img{
+width:230px;
+border-radius:15px;
+transform:rotate(-4deg);
+box-shadow:0 0 40px pink;
+}
+
+/* FOOTER */
+.footer{
+position:fixed;
+bottom:10px;
+width:100%;
+text-align:center;
+opacity:.6;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="bg"></div>
+<div class="overlay"></div>
+<canvas id="fw"></canvas>
+
+<audio id="music" src="snd.mp3" autoplay loop></audio> <button onclick="toggleMusic()" style="position:fixed;top:10px;right:10px;">🔊</button>
+
+<!-- SCENE 1 -->
+
+<div class="scene" id="s1">
+<img src="poto1.png" class="photo left">
+<img src="poto2.png" class="photo right">
+<div class="title">ekehmmmm ada yang ulang tahun nihh</div>
+<button class="btn" onclick="go(1)">pencet disini untuk menghancurkan dunia</button>
+</div>
+
+<!-- SCENE 2 -->
+
+<div class="scene hidden" id="s2">
+<div class="title">hari ini hari apa</div>
+<div class="grid">
+<div class="card" onclick="wrong1()">hari rabu</div>
+<div class="card" onclick="wrong1()">hari libur</div>
+<div class="card" onclick="wrong1()">hari bobo sedunia</div>
+<div class="card" onclick="go(2)">hari ulang tahun pacar hamdan</div>
+</div>
+</div>
+
+<!-- SCENE SALAH -->
+
+<div class="scene hidden" id="s2b">
+<div class="title">jawabannya salah 😜</div>
+<button class="btn" onclick="goBack()">coba lagi</button>
+</div>
+
+<!-- SCENE 3 -->
+
+<div class="scene hidden" id="s3">
+<img src="poto1.png" class="photo left">
+<img src="poto2.png" class="photo right">
+
+<div class="paper" id="text"></div>
+<button class="btn" onclick="go(3)">selanjutnya</button>
+</div>
+
+<!-- SCENE 4 -->
+
+<div class="scene hidden" id="s4">
+<div class="title">sayang sama aku gaa?</div>
+<div class="grid">
+<div class="card" onclick="wrong2()">sayang</div>
+<div class="card" onclick="wrong2()">sayang dong</div>
+<div class="card" onclick="go(4)">sayang banget banget banget</div>
+<div class="card" onclick="wrong2()">enga sayang</div>
+</div>
+</div>
+
+<div class="scene hidden" id="s4b">
+<div class="title">jawabannya salah 😭</div>
+<button class="btn" onclick="goBack2()">ulang</button>
+</div>
+
+<!-- SCENE 5 -->
+
+<div class="scene hidden" id="s5">
+<img src="poto3.png" class="final-img">
+<div id="loopText">bener nih sayang sama aku??</div>
+<div class="grid">
+<div class="card" onclick="loop()">sayang lah</div>
+<div class="card" onclick="loop()">boong akumah</div>
+</div>
+</div>
+
+<!-- SCENE 6 -->
+
+<div class="scene hidden" id="s6" style="background:url('poto5.png') center/cover">
+<div class="title">makasiiii yaa sayangg udaaa bukaaa iniii mwhehehe semoga kamuu sukaaa</div>
+<button class="btn" onclick="go(6)">selesai</button>
+</div>
+
+<!-- SCENE 7 -->
+
+<div class="scene hidden" id="s7" style="background:url('poto7.jpg') center/cover">
+<div class="title">ANASTASYA NOVI KRISTIA<br>22 April 2008</div>
+</div>
+
+<div class="footer">BY HAMDAN</div>
+
+<script>
+// SCENE
+function go(n){
+document.getElementById("s"+n).classList.add("hidden");
+document.getElementById("s"+(n+1)).classList.remove("hidden");
+if(n==2) typing();
+}
+function goBack(){
+document.getElementById("s2b").classList.add("hidden");
+document.getElementById("s2").classList.remove("hidden");
+}
+function goBack2(){
+document.getElementById("s4b").classList.add("hidden");
+document.getElementById("s4").classList.remove("hidden");
+}
+
+// QUIZ
+function wrong1(){
+document.getElementById("s2").classList.add("hidden");
+document.getElementById("s2b").classList.remove("hidden");
+}
+function wrong2(){
+document.getElementById("s4").classList.add("hidden");
+document.getElementById("s4b").classList.remove("hidden");
+}
+
+// LOOP
+let l=0;
+function loop(){
+l++;
+if(l>=3){
+document.getElementById("s5").innerHTML+='<button class="btn" onclick="go(5)">lanjut</button>';
+}else{
+document.getElementById("loopText").innerText="yakin?? 😏";
+}
+}
+
+// TEXT
+const msg=`Selamat ulang tahun, sayangku 🤍
+
+Hari ini adalah hari yang sangat spesial, bukan cuma karena bertambahnya usia kamu, tapi karena dunia lagi merayakan keberadaan seseorang yang begitu berarti buat aku. Aku bersyukur banget, dari sekian banyak kemungkinan di dunia ini, aku bisa dipertemukan sama kamu. Bukan hal yang kebetulan, tapi sesuatu yang menurutku adalah takdir terbaik yang pernah aku dapatkan.
+
+Aku tahu, perjalanan kamu sampai di titik ini nggak selalu mudah. Ada banyak hal yang mungkin orang lain nggak tahu, tentang perjuangan kamu, tentang rasa capek kamu, tentang hal-hal yang kamu pendam sendiri. Tapi justru itu yang bikin aku makin kagum sama kamu. Kamu kuat, kamu hebat, dan kamu selalu berusaha jadi versi terbaik dari diri kamu sendiri, bahkan di saat keadaan nggak mendukung.
+
+Di hari ulang tahun kamu ini, aku nggak cuma mau bilang “selamat ulang tahun”, tapi aku juga mau bilang terima kasih. Terima kasih karena sudah hadir di hidup aku. Terima kasih karena sudah jadi tempat aku pulang, tempat aku cerita, tempat aku ngerasa dimengerti. Terima kasih karena selalu sabar menghadapi aku, dengan segala kekurangan aku yang mungkin nggak mudah.
+
+Aku berharap, di usia kamu yang sekarang, semua hal baik semakin mendekat ke kamu. Semoga semua doa yang kamu simpan diam-diam, satu per satu mulai terjawab. Semoga langkah kamu selalu dipermudah, rezeki kamu dilancarkan, kesehatan kamu selalu dijaga, dan kebahagiaan selalu menemani kamu setiap hari.
+
+Kalau suatu hari kamu merasa capek, ingat ya… kamu nggak sendirian. Aku akan selalu ada buat kamu. Nggak harus selalu kuat, nggak harus selalu terlihat baik-baik saja. Kamu boleh lelah, kamu boleh istirahat, tapi jangan pernah menyerah. Karena aku akan tetap di sini, nemenin kamu, dukung kamu, dan percaya sama kamu.
+
+Aku juga mau minta maaf kalau selama ini aku masih banyak kurangnya. Mungkin aku belum bisa jadi yang terbaik buat kamu, mungkin aku masih sering bikin kamu kesel atau kecewa. Tapi aku janji, aku akan terus belajar, terus berusaha, dan terus memperbaiki diri, supaya aku bisa jadi seseorang yang pantas buat kamu.
+
+Sayang, kamu itu lebih berharga dari yang kamu kira. Kamu punya hati yang baik, cara berpikir yang indah, dan kehadiran yang bisa bikin orang lain merasa nyaman. Jangan pernah ngerasa kamu nggak cukup, karena di mata aku, kamu itu lebih dari cukup… bahkan lebih dari sempurna dengan caramu sendiri.
+
+Di hari ini, aku berharap kamu bisa tersenyum lebih banyak dari biasanya. Nikmati setiap detik hari ini, rasakan kebahagiaannya, dan simpan kenangan indahnya. Karena hari ini adalah tentang kamu, tentang semua hal baik yang ada di diri kamu, dan tentang masa depan indah yang menunggu kamu.
+
+Dan untuk ke depannya… aku harap aku masih boleh ada di samping kamu. Ngelewatin hari-hari kamu, nemenin kamu di saat senang maupun susah, jadi bagian dari cerita hidup kamu yang panjang. Aku nggak tahu masa depan seperti apa, tapi yang aku tahu, aku ingin tetap bersama kamu selama kita masih bisa saling menggenggam.
+
+Selamat ulang tahun sekali lagi, sayangku 🤍
+Semoga kamu selalu dikelilingi cinta, kebahagiaan, dan hal-hal baik yang nggak ada habisnya.
+
+Aku sayang kamu, hari ini, besok, dan seterusnya.
+.`;
+
+let i=0;
+function typing(){
+let el=document.getElementById("text");
+function t(){
+if(i<msg.length){
+el.innerHTML+=msg.charAt(i);
+i++;setTimeout(t,15)}
+}
+t();
+}
+
+// MUSIC
+function toggleMusic(){
+let m=document.getElementById("music");
+m.paused?m.play():m.pause();
+}
+
+// FIREWORKS BRUTAL
+const c=document.getElementById("fw");
+const ctx=c.getContext("2d");
+c.width=innerWidth;c.height=innerHeight;
+
+let p=[];
+function boom(){
+let x=Math.random()*c.width;
+let y=Math.random()*c.height/2;
+for(let i=0;i<150;i++){
+p.push({
+x,y,
+dx:(Math.random()-0.5)*10,
+dy:(Math.random()-0.5)*10,
+life:120,
+color:`hsl(${Math.random()*360},100%,60%)`
+})
+}}
+setInterval(boom,600);
+
+function draw(){
+ctx.clearRect(0,0,c.width,c.height);
+p.forEach((e,i)=>{
+e.x+=e.dx;
+e.y+=e.dy;
+e.life--;
+ctx.beginPath();
+ctx.arc(e.x,e.y,3,0,Math.PI*2);
+ctx.fillStyle=e.color;
+ctx.fill();
+if(e.life<=0)p.splice(i,1);
+});
+requestAnimationFrame(draw);
+}
+draw();
+</script>
+
+</body>
+</html>
